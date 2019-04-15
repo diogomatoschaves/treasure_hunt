@@ -2,6 +2,9 @@ import argparse
 import ast
 from enum import Enum
 
+import solver
+
+
 class TreasureMap:
     mapType = 0
     start = -1
@@ -10,25 +13,26 @@ class TreasureMap:
     dragons = []
     expectedRoutes = []
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('treasure_maps', help='The input problem text file')
     args = parser.parse_args()
     treasureMaps = readTreasureMap(args.treasure_maps)
     for missionID, treasureMap in enumerate(treasureMaps):
-        print("Starting mission #" + str(missionID+1) + ":")
+        print("Starting mission #" + str(missionID + 1) + ":")
 
         if treasureMap.mapType == MapType.NORMAL:
-            # [TODO] call your solution here
-            actualRoute = []
+            actualRoute = solver.normal_dijkstra(treasureMap)
         elif treasureMap.mapType == MapType.DRAGON:
             # [TODO] call your solution here
-            actualRoute = []
+            actualRoute = solver.states_dijkstra(treasureMap)
         elif treasureMap.mapType == MapType.RIVALRY:
             # [TODO] call your solution here
             actualRoute = []
 
         evaluateResult(treasureMap.expectedRoutes, actualRoute)
+
 
 # ----------------------------------------------------------------------------
 
@@ -36,6 +40,7 @@ class MapType(Enum):
     NORMAL = 1
     DRAGON = 2
     RIVALRY = 3
+
 
 class bcolors:
     OKGREEN = '\033[92m'
@@ -68,6 +73,7 @@ def readTreasureMap(treasure_maps):
             treasureMaps.append(tr)
     return treasureMaps
 
+
 def evaluateResult(expectedRoutes, actualRoute):
     for expectedRoute in expectedRoutes:
         if (expectedRoute == actualRoute):
@@ -75,12 +81,12 @@ def evaluateResult(expectedRoutes, actualRoute):
                 print(bcolors.OKGREEN + "   You correctly found out that there is no route.")
             else:
                 print(bcolors.OKGREEN + "   You found the treasure!")
-                print("   The route takes", len(actualRoute)*5, "minutes")
+                print("   The route takes", len(actualRoute) * 5, "minutes")
             print("  ", actualRoute, bcolors.ENDC)
             return
     if (expectedRoutes == [] and actualRoute == None):
         print(bcolors.OKGREEN + "   You correctly found out that there is no route.")
-        return    
+        return
     print(bcolors.FAIL + "   Your route and the expected route differ:")
     print("\n   Expected Route:")
     print("  ", expectedRoutes)
@@ -88,5 +94,6 @@ def evaluateResult(expectedRoutes, actualRoute):
     print("  ", actualRoute, bcolors.ENDC)
     print("--------------------")
 
+
 if __name__ == "__main__":
-     main()
+    main()
