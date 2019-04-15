@@ -7,9 +7,9 @@ import pathfinder
 
 def shortest_path_tree(graph):
     """
-    Computes the minimal distance in a graph.
-    :param graph: The graph to compute the minimal distance.
-    :return: An array with the indices of places to visit.
+    Computes the shortest path tree of a graph.
+    :param graph: The graph to process.
+    :return: A mapping of node -> parent node.
     """
     adj = defaultdict(list)
     for (u, v) in graph.roads:
@@ -46,15 +46,15 @@ def bidirectional_shortest_path(graph):
     :param graph: The graph to process.
     :return: An array with the indices of places to visit.
     """
-    treasure_map = pathfinder.TreasureMap()
-    treasure_map.start = graph.start
-    treasure_map.roads = set()
+    new_graph = pathfinder.TreasureMap()
+    new_graph.start = graph.start
+    new_graph.roads = set()
     # Because walking is bidirectional...
     for (u, v) in graph.roads:
-        treasure_map.roads.add((u, v))
-        treasure_map.roads.add((v, u))
+        new_graph.roads.add((u, v))
+        new_graph.roads.add((v, u))
 
-    parent = shortest_path_tree(graph)
+    parent = shortest_path_tree(new_graph)
     ret = backtrace(graph.treasure, parent)
     # The graph is connected...
     assert (ret[0] == graph.start)
@@ -67,8 +67,8 @@ def states_shortest_path(graph):
     :param graph: The graph to process.
     :return: An array with the indices of places to visit.
     """
-    treasure_map = pathfinder.TreasureMap()
-    treasure_map.start = (graph.start, 0)
+    new_graph = pathfinder.TreasureMap()
+    new_graph.start = (graph.start, 0)
 
     adj = defaultdict(set)
     for (u, v) in graph.roads:
@@ -80,11 +80,11 @@ def states_shortest_path(graph):
             if (dragon, 0) in adj_nodes:
                 adj_nodes.remove((dragon, 0))
 
-    treasure_map.roads = [(node, adj_node)
-                          for node, adj_nodes in adj.items()
-                          for adj_node in adj_nodes]
+    new_graph.roads = [(node, adj_node)
+                       for node, adj_nodes in adj.items()
+                       for adj_node in adj_nodes]
 
-    parent = shortest_path_tree(treasure_map)
+    parent = shortest_path_tree(new_graph)
     solutions = []
     for it in range(3):
         ret = backtrace((graph.treasure, it), parent)
@@ -92,6 +92,7 @@ def states_shortest_path(graph):
         if ret[0] == (graph.start, 0):
             solutions.append([item[0] for item in ret])
 
+    assert (solutions)
     return min(solutions, key=lambda solution: len(solution))
 
 
@@ -103,19 +104,19 @@ def restricted_shortest_path(graph):
     """
     nodes = bidirectional_shortest_path(graph)
 
-    treasure_map = pathfinder.TreasureMap()
-    treasure_map.start = graph.start
+    new_graph = pathfinder.TreasureMap()
+    new_graph.start = graph.start
     roads = set(graph.roads)
     for i in range(len(nodes) - 1):
         edge = (nodes[i], nodes[i + 1])
         if edge in roads:
             roads.remove(edge)
-    treasure_map.roads = []
+    new_graph.roads = []
     for (u, v) in roads:
-        treasure_map.roads.append((u, v))
-        treasure_map.roads.append((v, u))
+        new_graph.roads.append((u, v))
+        new_graph.roads.append((v, u))
 
-    parent = shortest_path_tree(treasure_map)
+    parent = shortest_path_tree(new_graph)
     ret = backtrace(graph.treasure, parent)
     # The graph is connected...
     assert (ret[0] == graph.start)
