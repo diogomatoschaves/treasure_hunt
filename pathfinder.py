@@ -23,13 +23,11 @@ def main():
         print("Starting mission #" + str(missionID + 1) + ":")
 
         if treasureMap.mapType == MapType.NORMAL:
-            actualRoute = solver.normal_dijkstra(treasureMap)
+            actualRoute = solver.bidirectional_shortest_path(treasureMap)
         elif treasureMap.mapType == MapType.DRAGON:
-            # [TODO] call your solution here
-            actualRoute = solver.states_dijkstra(treasureMap)
+            actualRoute = solver.states_shortest_path(treasureMap)
         elif treasureMap.mapType == MapType.RIVALRY:
-            # [TODO] call your solution here
-            actualRoute = []
+            actualRoute = solver.restricted_shortest_path(treasureMap)
 
         evaluateResult(treasureMap.expectedRoutes, actualRoute)
 
