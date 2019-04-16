@@ -2,10 +2,12 @@
 
 To run execute:
 ```bash
-python pathfinder.py treasure_maps.txt
+python3 pathfinder.py treasure_maps.txt
 ```
+**Note**: In _my_ Mac, Mojave 10.14.4, python command is 2.7 and does
+not contain enums, I suppose all examples where with python 3.
 
-Or also with:
+Or using docker:
 ```bash
 docker build -t treasure .
 docker run treasure
