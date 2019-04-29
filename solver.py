@@ -22,6 +22,10 @@ def shortest_path_tree(graph):
     heappush(q, (0, graph.start))
     while q:
         (dist, node) = heappop(q)
+
+        if node == graph.treasure:
+            return parent
+
         for next_node in adj[node]:
             if dist + 1 < distance[next_node]:
                 distance[next_node] = dist + 1
@@ -31,6 +35,25 @@ def shortest_path_tree(graph):
     return parent
 
 
+def getTreasure(graph, new_graph):
+
+    treasurePAths = []
+    for treasure in graph.treasure:
+        other_graph = new_graph
+        other_graph.treasure = treasure
+
+        parent = shortest_path_tree(new_graph)
+
+        ret = backtrace(treasure, parent)
+        # The graph is connected...
+        assert (ret[0] == graph.start)
+
+        treasurePAths.append(ret)
+
+    return min(treasurePAths, key=len)
+
+
+
 def backtrace(node, parent):
     """
     :param node: The starting node
@@ -38,6 +61,7 @@ def backtrace(node, parent):
     :return: A list in order of the visited nodes
     """
     return [] if node is None else backtrace(parent[node], parent) + [node]
+
 
 
 def bidirectional_shortest_path(graph):
@@ -54,11 +78,7 @@ def bidirectional_shortest_path(graph):
         new_graph.roads.add((u, v))
         new_graph.roads.add((v, u))
 
-    parent = shortest_path_tree(new_graph)
-    ret = backtrace(graph.treasure, parent)
-    # The graph is connected...
-    assert (ret[0] == graph.start)
-    return ret
+    return getTreasure(graph, new_graph)
 
 
 def states_shortest_path(graph):
@@ -104,6 +124,8 @@ def restricted_shortest_path(graph):
     """
     nodes = bidirectional_shortest_path(graph)
 
+    print(nodes)
+
     new_graph = pathfinder.TreasureMap()
     new_graph.start = graph.start
     roads = set(graph.roads)
@@ -116,8 +138,5 @@ def restricted_shortest_path(graph):
         new_graph.roads.append((u, v))
         new_graph.roads.append((v, u))
 
-    parent = shortest_path_tree(new_graph)
-    ret = backtrace(graph.treasure, parent)
-    # The graph is connected...
-    assert (ret[0] == graph.start)
-    return ret
+
+    return getTreasure(graph, new_graph)
